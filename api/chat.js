@@ -48,8 +48,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const key = process.env.GROQ_API_KEY
-  if (!key) return res.status(500).json({ error: 'The assistant is not set up yet.' })
+    const key = (process.env.GROQ_API_KEY || '').trim().replace(/^["']|["']$/g, '')
+  console.error('key check', key.length, key.slice(0, 4), key.slice(-4))
 
   const ip = String(req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim()
   if (limited(ip)) {
