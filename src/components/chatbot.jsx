@@ -419,7 +419,7 @@ export default function Chatbot() {
           ref={launcherRef}
           type="button"
           onClick={toggle}
-          aria-label={open ? 'Close chat' : 'Open chat: ask KAI'}
+          aria-label={open ? 'Close chat' : 'Open chat: "ASK KAI"'}
           aria-expanded={open}
           className="kai-launcher relative grid h-14 w-14 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-300 sm:h-17 sm:w-17"
         >
