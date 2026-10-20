@@ -1,0 +1,170 @@
+/* Certification square: a flat square that rests face-on and tumbles in 3D */
+
+.cc-stage {
+  --size: clamp(270px, 86vw, 390px);
+  position: relative;
+  height: calc(var(--size) + 150px);
+}
+
+/* ---------- Captions ---------- */
+.cc-caption {
+  position: absolute;
+  z-index: 1;
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  line-height: 1.7;
+  text-transform: uppercase;
+  color: rgba(232, 238, 251, 0.5);
+}
+@media (min-width: 640px) {
+  .cc-caption {
+    display: block;
+  }
+}
+.cc-caption-a {
+  right: 6%;
+  top: 9%;
+  text-align: right;
+}
+.cc-caption-b {
+  left: 5%;
+  bottom: 22%;
+}
+
+/* ---------- The square ---------- */
+.cc-enter {
+  cursor: pointer;
+  outline: none;
+  position: absolute;
+  left: 50%;
+  top: 28px;
+  z-index: 2;
+  width: var(--size);
+  height: var(--size);
+  margin-left: calc(var(--size) * -0.5);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.cc-enter:focus-visible {
+  outline: 2px solid rgba(108, 180, 255, 0.7);
+  outline-offset: 6px;
+  border-radius: 8px;
+}
+/* Position, size and spin are set from scroll position in the component */
+.cc-scene {
+  width: 100%;
+  height: 100%;
+  perspective: 1300px;
+}
+.cc-rise,
+.cc-tilt,
+.cc-cube {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+.cc-cube {
+  transition: transform var(--move, 1100ms) cubic-bezier(0.65, 0, 0.25, 1);
+}
+.cc-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  transform: rotateY(calc(var(--i) * 90deg)) translateZ(calc(var(--size) / 2));
+}
+.cc-top {
+  transform: rotateX(90deg) translateZ(calc(var(--size) / 2));
+}
+.cc-bottom {
+  transform: rotateX(-90deg) translateZ(calc(var(--size) / 2));
+}
+/* Simple lighting: light falls on the top, the underside is darker */
+.cc-card {
+  position: relative;
+}
+.cc-top .cc-card::after,
+.cc-bottom .cc-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.cc-top .cc-card::after {
+  background: linear-gradient(180deg, rgba(108, 180, 255, 0.16), transparent 60%);
+}
+.cc-bottom .cc-card::after {
+  background: rgba(0, 0, 0, 0.35);
+}
+.cc-card {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  padding: 1.5rem;
+  overflow: hidden;
+  border-radius: 6px;
+  border: 1px solid rgba(108, 180, 255, 0.4);
+  background: linear-gradient(155deg, #10224a 0%, #0a1531 55%, #070e22 100%);
+  box-shadow:
+    inset 0 0 44px rgba(29, 139, 255, 0.14),
+    0 0 60px rgba(29, 139, 255, 0.16);
+}
+@media (max-width: 400px) {
+  .cc-card {
+    padding: 1.15rem;
+  }
+}
+@media (max-width: 340px) {
+  .cc-card {
+    padding: 0.9rem;
+  }
+  .cc-card h4 {
+    font-size: 1rem;
+  }
+  .cc-card p {
+    line-height: 1.45;
+  }
+}
+
+/* ---------- Controls ---------- */
+.cc-controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* ---------- Phones: the square is nearly full width, so the text sits above it ---------- */
+@media (max-width: 639px) {
+  .cc-stage {
+    height: calc(var(--size) + 230px);
+  }
+  .cc-enter {
+    top: 128px;
+  }
+}
+
+/* ---------- Stop when off screen or paused ---------- */
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .cc-enter {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .cc-rise {
+    transform: none !important;
+  }
+  .cc-cube {
+    transition: none;
+  }
+}
