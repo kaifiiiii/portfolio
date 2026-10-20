@@ -9,11 +9,12 @@ import Projects from './components/Projects'
 import Experience from './components/Experience'
 import Education from './components/Education'
 import Contact from './components/Contact'
+import Chatbot from './components/chatbot'
 import CursorRingField from './components/CursorRingField'
 import { navLinks } from './data/navLinks'
 
 // Sections that are still temporary placeholders
- const done = ['home', 'about', 'skills', 'projects', 'experience', 'education', 'contact']
+const done = ['home', 'about', 'skills', 'projects', 'experience', 'education', 'contact']
 const placeholders = navLinks.filter((link) => !done.includes(link.id))
 
 const FIELD_COLORS = { items: ['#6cb4ff', '#1d8bff', '#0a1226'] }
@@ -64,7 +65,7 @@ export default function App() {
         <Hero />
         <About />
         <Skills />
-                <Projects />
+        <Projects />
         <Experience />
         <Education />
         <Contact />
@@ -82,6 +83,8 @@ export default function App() {
           </section>
         ))}
       </main>
+
+      <Chatbot />
     </>
   )
 }
