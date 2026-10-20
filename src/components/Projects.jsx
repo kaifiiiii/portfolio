@@ -80,7 +80,7 @@ export default function Projects() {
           </h2>
         </div>
 
-        {/* ---------- Featured: TruthLens ---------- */}
+        {/* ---------- Featured: Veriqo ---------- */}
         <article
           data-aos="fade-up"
           className="mt-14 grid items-center gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-14"
@@ -99,7 +99,7 @@ export default function Projects() {
               <Shot key={current.src} src={current.src} alt={current.alt} whole />
             </div>
 
-            <div className="mt-4 flex gap-2" role="group" aria-label="TruthLens screenshots">
+            <div className="mt-4 flex gap-2" role="group" aria-label="Veriqo screenshots">
               {truthlens.screenshots.map((s, i) => (
                 <button
                   key={s.label}
@@ -152,7 +152,7 @@ export default function Projects() {
               </p>
             )}
 
-            <ul aria-label="TruthLens technologies" className="mt-6 flex flex-wrap gap-2">
+            <ul aria-label="Veriqo technologies" className="mt-6 flex flex-wrap gap-2">
               {truthlens.tech.map((t) => (
                 <li
                   key={t}

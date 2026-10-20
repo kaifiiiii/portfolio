@@ -7,7 +7,7 @@ export const projectsContent = {
 }
 
 export const truthlens = {
-  name: 'TruthLens',
+  name: 'Veriqo',
   category: 'Full Stack / Generative AI',
   summary:
     'An AI-powered misinformation verification system that evaluates claims using retrieved evidence, live web search and LLM analysis, then explains the verdict with sources.',
@@ -30,12 +30,12 @@ export const truthlens = {
     {
       label: 'Interface',
       src: truthlensUi,
-      alt: 'TruthLens home screen with a text claim and YouTube input and a Verify button',
+      alt: 'Veriqo home screen with a text claim and YouTube input and a Verify button',
     },
     {
       label: 'Result',
       src: truthlensResult,
-      alt: 'TruthLens verification result with verdict, confidence, explanation and evidence tabs',
+      alt: 'Veriqo verification result with verdict, confidence, explanation and evidence tabs',
     },
   ],
 }

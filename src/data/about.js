@@ -21,7 +21,7 @@ export const aboutContent = {
       id: 'genai',
       label: 'Generative AI',
       Icon: Sparkles,
-      text: 'I apply Generative AI to practical problems. TruthLens, my AI-powered misinformation verification system, combines retrieval-augmented generation (RAG), ChromaDB, live web search and LLM-based analysis through API integration to help evaluate claims against evidence. I have also completed a Generative AI course covering prompt engineering and LLMs.',
+      text: 'I apply Generative AI to practical problems. Veriqo, my AI-powered misinformation verification system, combines retrieval-augmented generation (RAG), ChromaDB, live web search and LLM-based analysis through API integration to help evaluate claims against evidence. I have also completed a Generative AI course covering prompt engineering and LLMs.',
     },
     {
       id: 'open',
