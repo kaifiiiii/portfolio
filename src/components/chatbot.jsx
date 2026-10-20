@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Minus, Send, X } from 'lucide-react'
+import { Brain, FileText, MoreVertical, Rocket, Send, User, X } from 'lucide-react'
+import './chatbot.css'
 
 // Chip label shown to the visitor -> question actually sent through the normal chat flow
 const SUGGESTIONS = [
-  { label: 'Explore Projects', question: 'What projects has Kaif built?' },
-  { label: 'Technical Skills', question: 'What are his main technical skills?' },
-  { label: 'View Résumé', question: "Can I see Kaif's résumé?" },
-  { label: 'About Kaif', question: 'Tell me about Kaif.' },
+  { label: 'Explore Projects', Icon: Rocket, question: 'What projects has Kaif built?' },
+  { label: 'Technical Skills', Icon: Brain, question: 'What are his main technical skills?' },
+  { label: 'View Résumé', Icon: FileText, question: "Can I see Kaif's résumé?" },
+  { label: 'About Kaif', Icon: User, question: 'Tell me about Kaif.' },
 ]
 
 const GREETING = {
@@ -17,7 +18,7 @@ const GREETING = {
 
 const FADE_MS = 220
 
-// Chat bubble with a small AI spark in the corner
+// Chat bubble with a small AI spark in the corner (launcher icon)
 function KaiIcon({ size = 26 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -37,12 +38,29 @@ function KaiIcon({ size = 26 }) {
   )
 }
 
+// Round "K" badge used in the header and beside assistant messages
+function KMark({ size = 28 }) {
+  return (
+    <span
+      aria-hidden="true"
+      style={{ width: size, height: size }}
+      className="grid shrink-0 place-items-center rounded-full border border-sky-300/70 bg-navy-950 font-display font-extrabold leading-none text-white shadow-[0_0_12px_rgba(47,139,255,0.75),inset_0_0_8px_rgba(47,139,255,0.35)]"
+    >
+      <span style={{ fontSize: size * 0.5 }}>K</span>
+    </span>
+  )
+}
+
+const iconBtn =
+  'grid h-8 w-8 place-items-center rounded-full text-sky-100/80 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300'
+
 // Floating assistant. It talks to /api/chat, which holds the API key on the server.
 export default function Chatbot() {
   const [open, setOpen] = useState(false) // what the visitor asked for
   const [mounted, setMounted] = useState(false) // panel exists in the DOM
   const [visible, setVisible] = useState(false) // drives the fade/slide
   const [minimized, setMinimized] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const [messages, setMessages] = useState([GREETING])
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
@@ -52,7 +70,12 @@ export default function Chatbot() {
   const listRef = useRef(null)
   const inputRef = useRef(null)
   const launcherRef = useRef(null)
+  const menuRef = useRef(null)
+  const menuBtnRef = useRef(null)
   const hasOpened = useRef(false)
+
+  // One chip group, shown only when the last message is a finished assistant reply
+  const showChips = !busy && messages[messages.length - 1]?.role === 'assistant'
 
   // Open: mount first, then fade in on the next frame. Close: fade out, then unmount.
   useEffect(() => {
@@ -62,6 +85,7 @@ export default function Chatbot() {
       return () => cancelAnimationFrame(raf)
     }
     setVisible(false)
+    setMenuOpen(false)
     const t = setTimeout(() => setMounted(false), FADE_MS)
     return () => clearTimeout(t)
   }, [open])
@@ -82,13 +106,31 @@ export default function Chatbot() {
     if (el) el.scrollTop = el.scrollHeight
   }, [messages, busy, open, minimized])
 
-  // Escape closes the panel
+  // Escape closes the menu first, then the panel
   useEffect(() => {
     if (!open) return
-    const onKey = (e) => e.key === 'Escape' && setOpen(false)
+    const onKey = (e) => {
+      if (e.key !== 'Escape') return
+      if (menuOpen) {
+        setMenuOpen(false)
+        menuBtnRef.current?.focus()
+      } else {
+        setOpen(false)
+      }
+    }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [open])
+  }, [open, menuOpen])
+
+  // Clicking outside the menu closes it
+  useEffect(() => {
+    if (!menuOpen) return
+    const onDown = (e) => {
+      if (!menuRef.current?.contains(e.target)) setMenuOpen(false)
+    }
+    document.addEventListener('pointerdown', onDown)
+    return () => document.removeEventListener('pointerdown', onDown)
+  }, [menuOpen])
 
   // Track the visible height so the panel stays above the mobile keyboard
   useEffect(() => {
@@ -169,12 +211,22 @@ export default function Chatbot() {
     if (!input && inputRef.current) inputRef.current.style.height = 'auto'
   }, [input])
 
+  const clearChat = () => {
+    if (busyRef.current) return
+    setMessages([GREETING])
+    setInput('')
+    setMenuOpen(false)
+    inputRef.current?.focus()
+  }
+
+  const toggleMinimize = () => {
+    setMinimized((m) => !m)
+    setMenuOpen(false)
+  }
+
   const toggle = () => {
-    if (open && minimized) {
-      setMinimized(false)
-    } else {
-      setOpen((o) => !o)
-    }
+    if (open && minimized) setMinimized(false)
+    else setOpen((o) => !o)
   }
 
   return (
@@ -186,134 +238,183 @@ export default function Chatbot() {
         <section
           role="dialog"
           aria-label="KAI, Kaif's AI Assistant"
-          className={`mb-3 flex w-[calc(100vw-24px)] flex-col overflow-hidden rounded-2xl border border-brand/40 bg-navy-950/90 shadow-[0_0_50px_-12px_rgba(29,139,255,0.55),0_24px_50px_-20px_rgba(0,0,0,0.9)] backdrop-blur-xl transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none sm:w-95 ${
+          className={`kai-frame -mr-1 mb-3 w-[calc(100vw-24px)] transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none sm:mr-0 sm:w-100 ${
             minimized
               ? ''
               : 'h-[75dvh] max-h-[min(75dvh,calc(var(--vvh,100dvh)-96px))] sm:h-140 sm:max-h-[min(560px,calc(var(--vvh,100dvh)-120px))]'
           } ${visible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}
         >
-          <header className="flex items-center justify-between gap-3 border-b border-brand/20 bg-brand/5 px-4 py-3">
-            <div className="flex items-center gap-3">
-              <span className="grid h-9 w-9 place-items-center rounded-xl border border-brand/40 bg-brand/10 text-brand-soft">
-                <KaiIcon size={20} />
-              </span>
-              <div>
-                <p className="font-display text-sm font-bold leading-tight text-white">KAI</p>
-                <p className="flex items-center gap-1.5 text-[11px] leading-tight text-muted">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
-                  Kaif&rsquo;s AI Assistant
-                  <span className="sr-only">, online</span>
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => setMinimized((m) => !m)}
-                aria-label={minimized ? 'Expand chat' : 'Minimize chat'}
-                aria-expanded={!minimized}
-                className="grid h-8 w-8 place-items-center rounded-full text-muted transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-soft"
-              >
-                <Minus size={16} aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                aria-label="Close chat"
-                className="grid h-8 w-8 place-items-center rounded-full text-muted transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-soft"
-              >
-                <X size={16} aria-hidden="true" />
-              </button>
-            </div>
-          </header>
+          <div
+            className={`kai-inner relative flex flex-col overflow-hidden rounded-[28px] ${
+              minimized ? '' : 'h-full'
+            }`}
+          >
+            {/* Ambient background: gradients only */}
+            <div aria-hidden="true" className="kai-particles pointer-events-none absolute inset-0" />
+            <div aria-hidden="true" className="kai-poly-a" />
+            <div aria-hidden="true" className="kai-poly-b" />
 
-          {!minimized && (
-            <>
-              <div
-                ref={listRef}
-                role="log"
-                aria-live="polite"
-                aria-label="Conversation"
-                className="flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4"
-              >
-                {messages.map((m, i) => (
-                  <div key={i} className={m.role === 'user' ? 'flex justify-end' : 'flex justify-start'}>
-                    <p
-                      className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
-                        m.role === 'user'
-                          ? 'rounded-br-sm bg-brand text-white'
-                          : m.error
-                            ? 'rounded-bl-sm border border-red-400/30 bg-red-500/10 text-red-200'
-                            : 'rounded-bl-sm border border-white/10 bg-white/5 text-ink'
-                      }`}
+            {/* Header */}
+            <header className="relative z-10 flex items-center justify-between gap-3 border-b border-sky-400/25 px-4 py-3">
+              <div className="flex items-center gap-3">
+                <KMark size={40} />
+                <div>
+                  <p className="font-display text-base font-bold leading-tight text-white">KAI</p>
+                  <p className="flex items-center gap-1.5 text-xs leading-tight text-sky-100/70">
+                    <span
+                      className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.9)]"
+                      aria-hidden="true"
+                    />
+                    Online
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <div ref={menuRef} className="relative">
+                  <button
+                    ref={menuBtnRef}
+                    type="button"
+                    onClick={() => setMenuOpen((o) => !o)}
+                    aria-label="Chat options"
+                    aria-expanded={menuOpen}
+                    aria-controls="kai-menu"
+                    className={iconBtn}
+                  >
+                    <MoreVertical size={18} aria-hidden="true" />
+                  </button>
+                  {menuOpen && (
+                    <div
+                      id="kai-menu"
+                      className="absolute right-0 top-full z-20 mt-2 w-48 overflow-hidden rounded-xl border border-sky-400/40 bg-navy-950 p-1 shadow-[0_0_24px_-6px_rgba(47,139,255,0.7)]"
                     >
-                      {m.content}
-                    </p>
-                  </div>
-                ))}
-
-                {busy && (
-                  <div className="flex justify-start" role="status" aria-label="KAI is typing">
-                    <span className="flex gap-1 rounded-2xl rounded-bl-sm border border-white/10 bg-white/5 px-3.5 py-3">
-                      {[0, 1, 2].map((d) => (
-                        <span
-                          key={d}
-                          className="h-1.5 w-1.5 rounded-full bg-brand-soft motion-safe:animate-bounce"
-                          style={{ animationDelay: `${d * 150}ms` }}
-                        />
-                      ))}
-                    </span>
-                  </div>
-                )}
-
-                {showChips && (
-  <div className="flex flex-wrap gap-2 pt-1">
-    {SUGGESTIONS.map((s) => (
-      <button
-        key={s.label}
-        type="button"
-        onClick={() => send(s.question)}
-        className="rounded-full border border-brand/40 bg-brand/10 px-3.5 py-1.5 text-left text-xs text-brand-soft transition-colors hover:bg-brand/20 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-soft"
-      >
-        {s.label}
-      </button>
-    ))}
-  </div>
-)}
-                
-              </div>
-
-              <form
-                onSubmit={onSubmit}
-                className="flex items-end gap-2 border-t border-brand/20 bg-navy-950/60 p-3"
-              >
-                <textarea
-                  ref={inputRef}
-                  rows={1}
-                  value={input}
-                  onChange={onInput}
-                  onKeyDown={onKeyDown}
-                  maxLength={500}
-                  placeholder="Ask about Kaif..."
-                  aria-label="Your question"
-                  className="max-h-28 min-w-0 flex-1 resize-none rounded-2xl border border-white/15 bg-white/5 px-4 py-2.5 text-base leading-snug text-white placeholder:text-white/40 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 sm:text-sm"
-                />
+                      <button
+                        type="button"
+                        onClick={clearChat}
+                        disabled={busy}
+                        className="w-full rounded-lg px-3 py-2 text-left text-sm text-ink transition-colors hover:bg-brand/15 hover:text-white focus-visible:outline-2 focus-visible:outline-sky-300 disabled:opacity-40"
+                      >
+                        Clear conversation
+                      </button>
+                      <button
+                        type="button"
+                        onClick={toggleMinimize}
+                        className="w-full rounded-lg px-3 py-2 text-left text-sm text-ink transition-colors hover:bg-brand/15 hover:text-white focus-visible:outline-2 focus-visible:outline-sky-300"
+                      >
+                        {minimized ? 'Expand chat' : 'Minimize chat'}
+                      </button>
+                    </div>
+                  )}
+                </div>
                 <button
-                  type="submit"
-                  disabled={busy || !input.trim()}
-                  aria-label="Send question"
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand text-white transition-colors hover:bg-brand-soft hover:text-navy-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-soft disabled:opacity-40"
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  aria-label="Close chat"
+                  className={iconBtn}
                 >
-                  <Send size={16} aria-hidden="true" />
+                  <X size={18} aria-hidden="true" />
                 </button>
-              </form>
-            </>
-          )}
+              </div>
+            </header>
+
+            {!minimized && (
+              <>
+                {/* Conversation: scrolls on its own, header and input stay put */}
+                <div
+                  ref={listRef}
+                  role="log"
+                  aria-live="polite"
+                  aria-label="Conversation"
+                  className="kai-scroll relative z-10 min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-4 py-4"
+                >
+                  {messages.map((m, i) =>
+                    m.role === 'user' ? (
+                      <div key={i} className="flex justify-end">
+                        <p className="max-w-[85%] whitespace-pre-wrap wrap-break-word rounded-2xl rounded-br-sm border border-sky-300/50 bg-linear-to-b from-brand to-blue-700 px-4 py-2.5 text-sm leading-relaxed text-white shadow-[0_0_18px_-4px_rgba(47,139,255,0.8)]">
+                          {m.content}
+                        </p>
+                      </div>
+                    ) : (
+                      <div key={i} className="flex items-start gap-2.5">
+                        <KMark size={28} />
+                        <p
+                          className={`max-w-[82%] whitespace-pre-wrap wrap-break-word rounded-2xl rounded-tl-sm border px-4 py-3 text-sm leading-relaxed ${
+                            m.error
+                              ? 'border-red-400/40 bg-red-500/10 text-red-200'
+                              : 'border-sky-400/30 bg-linear-to-br from-white/8 to-white/2 text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
+                          }`}
+                        >
+                          {m.content}
+                        </p>
+                      </div>
+                    )
+                  )}
+
+                  {busy && (
+                    <div className="flex items-start gap-2.5" role="status" aria-label="KAI is typing">
+                      <KMark size={28} />
+                      <span className="flex gap-1 rounded-2xl rounded-tl-sm border border-sky-400/30 bg-white/5 px-4 py-3.5">
+                        {[0, 1, 2].map((d) => (
+                          <span
+                            key={d}
+                            className="h-1.5 w-1.5 rounded-full bg-sky-300 motion-safe:animate-bounce"
+                            style={{ animationDelay: `${d * 150}ms` }}
+                          />
+                        ))}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* One chip group, below the latest finished answer */}
+                  {showChips && (
+                    <div className="flex flex-wrap gap-2 pl-9">
+                      {SUGGESTIONS.map(({ label, Icon, question }) => (
+                        <button
+                          key={label}
+                          type="button"
+                          onClick={() => send(question)}
+                          className="inline-flex items-center gap-2 rounded-full border border-sky-400/50 bg-navy-950/50 px-3.5 py-1.5 text-xs text-sky-100 shadow-[0_0_12px_-4px_rgba(47,139,255,0.7)] transition-[transform,border-color,background-color,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-sky-300 hover:bg-brand/15 hover:shadow-[0_0_18px_-3px_rgba(80,170,255,0.9)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+                        >
+                          <Icon size={15} className="text-sky-300" aria-hidden="true" />
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Input: always visible at the bottom */}
+                <form onSubmit={onSubmit} className="relative z-10 px-3 pb-3 pt-1">
+                  <div className="flex items-end gap-2 rounded-2xl border border-sky-400/40 bg-linear-to-b from-white/6 to-white/2 p-1.5 transition-[border-color,box-shadow] focus-within:border-sky-300 focus-within:shadow-[0_0_18px_-4px_rgba(80,170,255,0.8)]">
+                    <textarea
+                      ref={inputRef}
+                      rows={1}
+                      value={input}
+                      onChange={onInput}
+                      onKeyDown={onKeyDown}
+                      maxLength={500}
+                      placeholder="Type message..."
+                      aria-label="Your question"
+                      className="max-h-28 min-w-0 flex-1 resize-none bg-transparent px-3 py-2.5 text-base leading-snug text-white placeholder:text-sky-100/45 focus:outline-none sm:text-sm"
+                    />
+                    <button
+                      type="submit"
+                      disabled={busy || !input.trim()}
+                      aria-label="Send question"
+                      className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-linear-to-br from-cyan-400 to-brand text-white shadow-[0_0_16px_-2px_rgba(34,211,238,0.7)] transition-[opacity,box-shadow] hover:shadow-[0_0_22px_0_rgba(34,211,238,0.85)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 disabled:opacity-40 disabled:shadow-none"
+                    >
+                      <Send size={17} aria-hidden="true" />
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+          </div>
         </section>
       )}
 
       <div className="group relative">
-        {/* Tooltip: hover and keyboard focus only, hidden on touch-sized screens */}
+        {/* Tooltip: hover and keyboard focus only, hidden on small screens */}
         <span
           role="tooltip"
           className="pointer-events-none absolute right-full top-1/2 mr-3 hidden -translate-y-1/2 whitespace-nowrap rounded-lg border border-brand/30 bg-navy-950/95 px-3 py-1.5 text-xs text-ink opacity-0 transition-opacity duration-150 group-focus-within:opacity-100 group-hover:opacity-100 sm:block"

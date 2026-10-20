@@ -1,0 +1,140 @@
+/* KAI chatbot: glowing frame, ambient background, slow glow animation. */
+
+/* Outer frame: a 1.5px gradient ring (white, blue, cyan, violet) around the dark panel */
+.kai-frame {
+  position: relative;
+  isolation: isolate;
+  padding: 1.5px;
+  border-radius: 30px;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #a9d4ff 16%,
+    #2f8bff 42%,
+    #22d3ee 68%,
+    #8b7bff 88%,
+    #d6eaff 100%
+  );
+}
+
+/* Neon glow: stacked shadows on a layer behind the content, so only opacity animates */
+.kai-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    0 0 5px rgba(205, 230, 255, 0.95),
+    0 0 20px rgba(47, 139, 255, 0.7),
+    0 0 56px rgba(29, 139, 255, 0.45),
+    0 0 110px rgba(34, 211, 238, 0.18);
+  animation: kai-glow 7s ease-in-out infinite;
+}
+
+/* Soft cyan highlight that sweeps across the ring now and then (ring only, via mask) */
+.kai-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  pointer-events: none;
+  background: linear-gradient(200deg, rgba(34, 211, 238, 1), transparent 48%);
+   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  animation: kai-sheen 12s ease-in-out infinite;
+}
+
+@keyframes kai-glow {
+  0%,
+  100% {
+    opacity: 0.72;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes kai-sheen {
+  0%,
+  62%,
+  100% {
+    opacity: 0;
+  }
+  80% {
+    opacity: 0.9;
+  }
+}
+
+/* Inner panel surface */
+.kai-inner {
+  background:
+    radial-gradient(120% 65% at 88% 0%, rgba(29, 139, 255, 0.2), transparent 60%),
+    radial-gradient(90% 55% at 0% 100%, rgba(125, 95, 255, 0.14), transparent 62%),
+    linear-gradient(180deg, #07112b 0%, #040816 100%);
+}
+
+/* A few faint particles, drawn as gradients: no images, no DOM nodes */
+.kai-particles {
+  background:
+    radial-gradient(circle at 10% 24%, rgba(170, 205, 255, 0.55) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 92% 38%, rgba(170, 205, 255, 0.5) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 70% 82%, rgba(200, 225, 255, 0.5) 0 2px, transparent 3px),
+    radial-gradient(circle at 24% 68%, rgba(120, 170, 255, 0.2) 0 7px, transparent 14px),
+    radial-gradient(circle at 84% 12%, rgba(120, 170, 255, 0.18) 0 9px, transparent 18px);
+}
+
+/* Two very faint geometric shards */
+.kai-poly-a,
+.kai-poly-b {
+  position: absolute;
+  pointer-events: none;
+}
+.kai-poly-a {
+  top: -10%;
+  right: -12%;
+  width: 55%;
+  height: 40%;
+  background: linear-gradient(135deg, rgba(60, 120, 230, 0.16), transparent 70%);
+  clip-path: polygon(30% 0, 100% 0, 100% 80%, 0 40%);
+}
+.kai-poly-b {
+  bottom: -8%;
+  left: -14%;
+  width: 60%;
+  height: 38%;
+  background: linear-gradient(45deg, rgba(110, 90, 240, 0.14), transparent 70%);
+  clip-path: polygon(0 20%, 80% 0, 100% 100%, 0 100%);
+}
+
+/* Slim blue scrollbar for the conversation */
+.kai-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(47, 139, 255, 0.45) transparent;
+}
+
+/* Lighter glow on phones */
+@media (max-width: 639px) {
+  .kai-frame::before {
+    box-shadow:
+      0 0 4px rgba(205, 230, 255, 0.9),
+      0 0 16px rgba(47, 139, 255, 0.6),
+      0 0 38px rgba(29, 139, 255, 0.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kai-frame::before {
+    animation: none;
+    opacity: 1;
+  }
+  .kai-frame::after {
+    animation: none;
+    opacity: 0;
+  }
+}
