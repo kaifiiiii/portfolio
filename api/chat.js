@@ -6,7 +6,6 @@ import { KNOWLEDGE } from './knowledge.js'
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions'
 const MODEL = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile'
   const key = process.env.GROQ_API_KEY
-  console.error('key check', key?.length, key?.slice(0, 4), key?.slice(-4))
   if (!key) return res.status(500).json({ error: 'The assistant is not set up yet.' })
 
 const MAX_MESSAGES = 8 // how much recent conversation is sent to the model
