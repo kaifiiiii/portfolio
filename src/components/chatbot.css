@@ -42,10 +42,9 @@
   padding: 1.5px;
   pointer-events: none;
   background: linear-gradient(200deg, rgba(34, 211, 238, 1), transparent 48%);
-   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask-composite: exclude;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
   opacity: 0;
   animation: kai-sheen 12s ease-in-out infinite;
 }
