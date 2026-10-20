@@ -266,20 +266,21 @@ export default function Chatbot() {
                   </div>
                 )}
 
-                {messages.length === 1 && !busy && (
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {SUGGESTIONS.map((s) => (
-                      <button
-                        key={s.label}
-                        type="button"
-                        onClick={() => send(s.question)}
-                        className="rounded-full border border-brand/40 bg-brand/10 px-3.5 py-1.5 text-left text-xs text-brand-soft transition-colors hover:bg-brand/20 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-soft"
-                      >
-                        {s.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                {showChips && (
+  <div className="flex flex-wrap gap-2 pt-1">
+    {SUGGESTIONS.map((s) => (
+      <button
+        key={s.label}
+        type="button"
+        onClick={() => send(s.question)}
+        className="rounded-full border border-brand/40 bg-brand/10 px-3.5 py-1.5 text-left text-xs text-brand-soft transition-colors hover:bg-brand/20 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-soft"
+      >
+        {s.label}
+      </button>
+    ))}
+  </div>
+)}
+                
               </div>
 
               <form
