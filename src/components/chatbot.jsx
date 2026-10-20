@@ -18,35 +18,29 @@ const GREETING = {
 
 const FADE_MS = 220
 
-// Chat bubble with a small AI spark in the corner (launcher icon)
-function KaiIcon({ size = 26 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M4 6.5A3.5 3.5 0 0 1 7.5 3h6A3.5 3.5 0 0 1 17 6.5v4A3.5 3.5 0 0 1 13.5 14H10l-3.6 3.2c-.5.4-1.4.1-1.4-.6V14.2A3.5 3.5 0 0 1 4 10.5v-4Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-      <circle cx="8" cy="8.5" r="0.9" fill="currentColor" />
-      <circle cx="12.5" cy="8.5" r="0.9" fill="currentColor" />
-      <path
-        d="M19 12.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7.7-1.8Z"
-        fill="currentColor"
-      />
-    </svg>
-  )
-}
+// The glass sphere (public/images/kai-sphere.webp). A CSS glow sits behind it.
+// Used for the launcher (floating), the header, and beside assistant messages.
+const SPHERE = '/images/kai-sphere.webp'
 
-// Round "K" badge used in the header and beside assistant messages
-function KMark({ size = 28 }) {
+function Orb({ size, busy = false, floating = false }) {
   return (
     <span
       aria-hidden="true"
-      style={{ width: size, height: size }}
-      className="grid shrink-0 place-items-center rounded-full border border-sky-300/70 bg-navy-950 font-display font-extrabold leading-none text-white shadow-[0_0_12px_rgba(47,139,255,0.75),inset_0_0_8px_rgba(47,139,255,0.35)]"
+      data-busy={busy ? 'true' : 'false'}
+      style={size ? { width: size, height: size } : undefined}
+      className={`kai-orb relative inline-grid shrink-0 place-items-center ${
+        size ? '' : 'h-full w-full'
+      } ${floating ? 'kai-float' : ''}`}
     >
-      <span style={{ fontSize: size * 0.5 }}>K</span>
+      <span className="kai-orb-glow" />
+      <img
+        src={SPHERE}
+        width={256}
+        height={256}
+        alt=""
+        draggable="false"
+        className="relative h-full w-full select-none object-contain"
+      />
     </span>
   )
 }
@@ -257,7 +251,7 @@ export default function Chatbot() {
             {/* Header */}
             <header className="relative z-10 flex items-center justify-between gap-3 border-b border-sky-400/25 px-4 py-3">
               <div className="flex items-center gap-3">
-                <KMark size={40} />
+                <Orb size={44} busy={busy} />
                 <div>
                   <p className="font-display text-base font-bold leading-tight text-white">KAI</p>
                   <p className="flex items-center gap-1.5 text-xs leading-tight text-sky-100/70">
@@ -336,7 +330,7 @@ export default function Chatbot() {
                       </div>
                     ) : (
                       <div key={i} className="flex items-start gap-2.5">
-                        <KMark size={28} />
+                        <Orb size={32} />
                         <p
                           className={`max-w-[82%] whitespace-pre-wrap wrap-break-word rounded-2xl rounded-tl-sm border px-4 py-3 text-sm leading-relaxed ${
                             m.error
@@ -352,7 +346,7 @@ export default function Chatbot() {
 
                   {busy && (
                     <div className="flex items-start gap-2.5" role="status" aria-label="KAI is typing">
-                      <KMark size={28} />
+                      <Orb size={32} busy />
                       <span className="flex gap-1 rounded-2xl rounded-tl-sm border border-sky-400/30 bg-white/5 px-4 py-3.5">
                         {[0, 1, 2].map((d) => (
                           <span
@@ -367,7 +361,7 @@ export default function Chatbot() {
 
                   {/* One chip group, below the latest finished answer */}
                   {showChips && (
-                    <div className="flex flex-wrap gap-2 pl-9">
+                    <div className="flex flex-wrap gap-2 pl-[42px]">
                       {SUGGESTIONS.map(({ label, Icon, question }) => (
                         <button
                           key={label}
@@ -419,17 +413,17 @@ export default function Chatbot() {
           role="tooltip"
           className="pointer-events-none absolute right-full top-1/2 mr-3 hidden -translate-y-1/2 whitespace-nowrap rounded-lg border border-brand/30 bg-navy-950/95 px-3 py-1.5 text-xs text-ink opacity-0 transition-opacity duration-150 group-focus-within:opacity-100 group-hover:opacity-100 sm:block"
         >
-          Ask Kaif&rsquo;s AI
+          Ask KAI
         </span>
         <button
           ref={launcherRef}
           type="button"
           onClick={toggle}
-          aria-label={open ? 'Close chat' : "Open chat: ask Kaif's AI"}
+          aria-label={open ? 'Close chat' : 'Open chat: ask KAI'}
           aria-expanded={open}
-          className="grid h-14 w-14 place-items-center rounded-full border border-brand/50 bg-navy-900/80 text-brand-soft shadow-[0_0_24px_-6px_rgba(29,139,255,0.6)] backdrop-blur-md transition-[transform,box-shadow,color] duration-200 hover:-translate-y-0.5 hover:text-white hover:shadow-[0_0_32px_-4px_rgba(29,139,255,0.8)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-soft motion-reduce:transition-none motion-reduce:hover:translate-y-0 sm:h-15 sm:w-15"
+          className="kai-launcher relative grid h-14 w-14 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-300 sm:h-17 sm:w-17"
         >
-          {open ? <X size={22} aria-hidden="true" /> : <KaiIcon size={26} />}
+          <Orb floating busy={busy} />
         </button>
       </div>
     </div>

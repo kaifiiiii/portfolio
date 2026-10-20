@@ -42,9 +42,10 @@
   padding: 1.5px;
   pointer-events: none;
   background: linear-gradient(200deg, rgba(34, 211, 238, 1), transparent 48%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
   opacity: 0;
   animation: kai-sheen 12s ease-in-out infinite;
 }
@@ -135,5 +136,107 @@
   .kai-frame::after {
     animation: none;
     opacity: 0;
+  }
+}
+
+/* ---------- Glass sphere: launcher, header and message avatars ---------- */
+
+/* Soft purple-blue halo with a faint cyan reflection underneath; only opacity animates */
+.kai-orb-glow {
+  position: absolute;
+  inset: -22%;
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 86%, rgba(34, 211, 238, 0.22), transparent 38%),
+    radial-gradient(
+      circle,
+      rgba(124, 92, 255, 0.55) 0%,
+      rgba(47, 139, 255, 0.34) 38%,
+      rgba(47, 139, 255, 0.1) 58%,
+      transparent 72%
+    );
+  opacity: 0.5;
+  transition: transform 0.2s ease;
+  animation: kai-orb-pulse 4s ease-in-out infinite;
+}
+
+.kai-orb img {
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+/* Slow vertical float (launcher only) */
+.kai-float {
+  animation: kai-float 3.6s ease-in-out infinite;
+}
+
+@keyframes kai-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes kai-float-busy {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+@keyframes kai-orb-pulse {
+  0%,
+  100% {
+    opacity: 0.42;
+  }
+  50% {
+    opacity: 0.78;
+  }
+}
+
+/* Hover and keyboard focus: a little more glow, a touch bigger, brighter reflections */
+.kai-launcher:hover img,
+.kai-launcher:focus-visible img {
+  transform: scale(1.06);
+  filter: brightness(1.18) saturate(1.1);
+}
+.kai-launcher:hover .kai-orb-glow,
+.kai-launcher:focus-visible .kai-orb-glow {
+  transform: scale(1.14);
+}
+
+/* While KAI is answering: brighter, quicker pulse, slightly larger float */
+.kai-orb[data-busy='true'] img {
+  filter: brightness(1.15);
+}
+.kai-orb[data-busy='true'] .kai-orb-glow {
+  animation-duration: 1.6s;
+}
+.kai-orb.kai-float[data-busy='true'] {
+  animation-name: kai-float-busy;
+  animation-duration: 2.6s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kai-float,
+  .kai-orb.kai-float[data-busy='true'] {
+    animation: none;
+  }
+  .kai-orb-glow {
+    animation: none;
+    opacity: 0.6;
+    transition: none;
+  }
+  .kai-orb img,
+  .kai-launcher:hover img,
+  .kai-launcher:focus-visible img {
+    transition: none;
+    transform: none;
   }
 }
