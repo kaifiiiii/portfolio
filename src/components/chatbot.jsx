@@ -81,7 +81,7 @@ export default function Chatbot() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-[60] sm:bottom-6 sm:right-6">
+    <div className="fixed bottom-4 right-4 z-60 sm:bottom-6 sm:right-6">
       {open && (
         <section
           role="dialog"
