@@ -12,12 +12,15 @@ export const heroContent = {
 
 // One entry per sentence. Keep this identical to what the audio says.
 export const introScript = [
-  "Hi, I'm Kaif, a Computer Science undergraduate at Jamia Hamdard and an aspiring full stack web developer.",
-  'I build web applications with React, Node.js, Express and SQL, including a food donation platform called Food Bridge.',
-  'I also explore how Generative AI can solve real problems, through a project called TruthLens, an AI-powered misinformation verification system.',
-  'Full Stack Web Developer who builds modern web applications and applies Generative AI to real-world problems.',
-  'Take a look around, and feel free to get in touch.',
+  "Hey, I'm Kaif! Welcome to my portfolio.",
+  "I'm a final-year Computer Science student at Jamia Hamdard, currently pursuing my Bachelor of Technology.",
+  "I'm interested in building applications and using Generative AI to solve real-world problems.",
+  'One of my projects is Veriqo, an AI-powered misinformation verification system that helps people verify claims using AI and real-world sources.',
+  "I've also worked on Food Bridge, a platform that connects food donors with NGOs.",
+  'I enjoy learning new things, experimenting with ideas, and bringing them to life through code.',
+  "Feel free to look around, explore my work, and if something catches your eye, let's connect!",
 ]
+
 
 export const techStack = [
   { name: 'Python', Icon: FaPython, color: '#4B8BBE' },
