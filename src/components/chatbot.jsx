@@ -46,6 +46,27 @@ function Orb({ size, busy = false, floating = false }) {
   )
 }
 
+// Make links in assistant replies clickable
+function linkify(text) {
+  return text.split(/(https?:\/\/[^\s]+)/g).map((part, i) => {
+    if (!/^https?:\/\//.test(part)) return part
+    const [, url, tail] = part.match(/^(.*?)([.,;:!?)]*)$/)
+    return (
+      <span key={i}>
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sky-300 underline underline-offset-2 hover:text-white"
+        >
+          {url}
+        </a>
+        {tail}
+      </span>
+    )
+  })
+}
+
 const iconBtn =
   'grid h-8 w-8 place-items-center rounded-full text-sky-100/80 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300'
 
@@ -345,7 +366,7 @@ export default function Chatbot() {
                               : 'border-sky-400/30 bg-linear-to-br from-white/8 to-white/2 text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
                           }`}
                         >
-                          {m.content}
+                          {linkify(m.content)}
                         </p>
                       </div>
                     )
