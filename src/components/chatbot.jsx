@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Brain, FileText, MoreVertical, Rocket, Send, User, X } from 'lucide-react'
+import ParticleSphere from './ParticleSphere'
 import './chatbot.css'
 
 // Chip label shown to the visitor -> question actually sent through the normal chat flow
@@ -59,6 +60,7 @@ export default function Chatbot() {
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
   const [vvHeight, setVvHeight] = useState(null)
+  const [pulse, setPulse] = useState(0) // bumps each time the chat opens
 
   const busyRef = useRef(false) // blocks double submits before state updates land
   const listRef = useRef(null)
@@ -82,6 +84,11 @@ export default function Chatbot() {
     setMenuOpen(false)
     const t = setTimeout(() => setMounted(false), FADE_MS)
     return () => clearTimeout(t)
+  }, [open])
+
+  // Brief brightness pulse on the launcher sphere when the chat opens
+  useEffect(() => {
+    if (open) setPulse((p) => p + 1)
   }, [open])
 
   // Focus the input when opened, and give focus back to the launcher when closed
@@ -411,9 +418,9 @@ export default function Chatbot() {
         {/* Tooltip: hover and keyboard focus only, hidden on small screens */}
         <span
           role="tooltip"
-          className="pointer-events-none absolute right-full top-1/2 mr-3 hidden -translate-y-1/2 whitespace-nowrap rounded-lg border border-brand/30 bg-navy-950/95 px-3 py-1.5 text-xs text-ink opacity-0 transition-opacity duration-150 group-focus-within:opacity-100 group-hover:opacity-100 sm:block"
+          className="pointer-events-none absolute right-full top-1/2 mr-3 hidden -translate-y-1/2 whitespace-nowrap rounded-lg border border-brand/30 bg-navy-950/95 px-3 py-1.5 text-xs font-semibold tracking-[0.15em] text-ink opacity-0 transition-opacity duration-150 group-focus-within:opacity-100 group-hover:opacity-100 sm:block"
         >
-          Ask KAI
+          ASK KAI
         </span>
         <button
           ref={launcherRef}
@@ -421,9 +428,13 @@ export default function Chatbot() {
           onClick={toggle}
           aria-label={open ? 'Close chat' : 'Open chat: ask KAI'}
           aria-expanded={open}
-          className="kai-launcher relative grid h-14 w-14 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-300 sm:h-17 sm:w-17"
+          className="kai-launcher relative grid h-17 w-17 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-300 sm:h-21 sm:w-21"
         >
-          <Orb floating busy={busy} />
+          <span className="kai-orb relative block h-full w-full" data-busy={busy ? 'true' : 'false'}>
+            <span className="kai-orb-glow" />
+            <span className="kai-pdisc" />
+            <ParticleSphere busy={busy} pulseKey={pulse} />
+          </span>
         </button>
       </div>
     </div>
