@@ -249,7 +249,7 @@ export default function Chatbot() {
             <div aria-hidden="true" className="kai-poly-b" />
 
             {/* Header */}
-            <header className="relative z-10 flex items-center justify-between gap-3 border-b border-sky-400/25 px-4 py-3">
+            <header className="relative z-20 flex items-center justify-between gap-3 border-b border-sky-400/25 px-4 py-3">
               <div className="flex items-center gap-3">
                 <Orb size={44} busy={busy} />
                 <div>
@@ -419,7 +419,7 @@ export default function Chatbot() {
           ref={launcherRef}
           type="button"
           onClick={toggle}
-          aria-label={open ? 'Close chat' : 'Open chat: "ASK KAI"'}
+          aria-label={open ? 'Close chat' : 'Open chat: ask KAI'}
           aria-expanded={open}
           className="kai-launcher relative grid h-14 w-14 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-300 sm:h-17 sm:w-17"
         >
