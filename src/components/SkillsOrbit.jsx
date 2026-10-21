@@ -56,9 +56,7 @@ export default function SkillsOrbit() {
           <div className="orbit-core-body">
             <CodeXml aria-hidden="true" className="orbit-code" strokeWidth={1.6} />
             <p className="orbit-core-title">
-              Engineer
-              <br />
-              in progress
+              CODE × AI
             </p>
             <span aria-hidden="true" className="orbit-core-rule" />
             <p className="orbit-core-caption">Learning. Building. Evolving.</p>
