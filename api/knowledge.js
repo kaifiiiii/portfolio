@@ -37,7 +37,7 @@ CERTIFICATIONS AND PARTICIPATION
 - Data Science and Analytics, HP LIFE (HP Foundation): data science, analytics methodologies, data-driven business.
 
 RESUME
-Kaif's résumé is available as a PDF here: https://YOUR-DOMAIN/Kaif-Resume.pdf
+Kaif's résumé is available as a PDF here: https://portfolio-ajlhgsjzf-truthlens5.vercel.app/Kaif-Resume.pdf
 When someone asks for the résumé or CV, share this link. The résumé covers his summary, education, internship, Food Bridge project, technical skills, certifications and strengths.
 
 CONTACT
@@ -47,3 +47,6 @@ LinkedIn: https://www.linkedin.com/in/kaifi
 Location: New Delhi, India (studies); from Jamshedpur, Jharkhand
 The portfolio site also has a contact form.
 `
+
+
+
