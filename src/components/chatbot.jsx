@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Brain, FileText, MoreVertical, Rocket, Send, User, X } from 'lucide-react'
+import { Brain, ChevronUp, FileText, Minus, MoreVertical, Rocket, Send, User, X } from 'lucide-react'
 import ParticleSphere from './ParticleSphere'
 import './chatbot.css'
 
@@ -293,41 +293,49 @@ export default function Chatbot() {
               </div>
 
               <div className="flex items-center gap-1">
-                <div ref={menuRef} className="relative">
-                  <button
-                    ref={menuBtnRef}
-                    type="button"
-                    onClick={() => setMenuOpen((o) => !o)}
-                    aria-label="Chat options"
-                    aria-expanded={menuOpen}
-                    aria-controls="kai-menu"
-                    className={iconBtn}
-                  >
-                    <MoreVertical size={18} aria-hidden="true" />
-                  </button>
-                  {menuOpen && (
-                    <div
-                      id="kai-menu"
-                      className="absolute right-0 top-full z-20 mt-2 w-48 overflow-hidden rounded-xl border border-sky-400/40 bg-navy-950 p-1 shadow-[0_0_24px_-6px_rgba(47,139,255,0.7)]"
-                    >
-                      <button
-                        type="button"
-                        onClick={clearChat}
-                        disabled={busy}
-                        className="w-full rounded-lg px-3 py-2 text-left text-sm text-ink transition-colors hover:bg-brand/15 hover:text-white focus-visible:outline-2 focus-visible:outline-sky-300 disabled:opacity-40"
-                      >
-                        Clear conversation
-                      </button>
-                      <button
-                        type="button"
-                        onClick={toggleMinimize}
-                        className="w-full rounded-lg px-3 py-2 text-left text-sm text-ink transition-colors hover:bg-brand/15 hover:text-white focus-visible:outline-2 focus-visible:outline-sky-300"
-                      >
-                        {minimized ? 'Expand chat' : 'Minimize chat'}
-                      </button>
-                    </div>
+                <button
+                  type="button"
+                  onClick={toggleMinimize}
+                  aria-label={minimized ? 'Expand chat' : 'Minimize chat'}
+                  aria-expanded={!minimized}
+                  className={iconBtn}
+                >
+                  {minimized ? (
+                    <ChevronUp size={18} aria-hidden="true" />
+                  ) : (
+                    <Minus size={18} aria-hidden="true" />
                   )}
-                </div>
+                </button>
+                {!minimized && (
+                  <div ref={menuRef} className="relative">
+                    <button
+                      ref={menuBtnRef}
+                      type="button"
+                      onClick={() => setMenuOpen((o) => !o)}
+                      aria-label="Chat options"
+                      aria-expanded={menuOpen}
+                      aria-controls="kai-menu"
+                      className={iconBtn}
+                    >
+                      <MoreVertical size={18} aria-hidden="true" />
+                    </button>
+                    {menuOpen && (
+                      <div
+                        id="kai-menu"
+                        className="absolute right-0 top-full z-20 mt-2 w-48 overflow-hidden rounded-xl border border-sky-400/40 bg-navy-950 p-1 shadow-[0_0_24px_-6px_rgba(47,139,255,0.7)]"
+                      >
+                        <button
+                          type="button"
+                          onClick={clearChat}
+                          disabled={busy}
+                          className="w-full rounded-lg px-3 py-2 text-left text-sm text-ink transition-colors hover:bg-brand/15 hover:text-white focus-visible:outline-2 focus-visible:outline-sky-300 disabled:opacity-40"
+                        >
+                          Clear conversation
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
