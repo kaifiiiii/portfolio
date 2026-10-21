@@ -35,3 +35,4 @@ export default function useInView({ threshold = 0.2, rootMargin = '0px' } = {}) 
 
   return [ref, state]
 }
+

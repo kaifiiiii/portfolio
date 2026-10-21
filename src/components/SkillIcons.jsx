@@ -20,3 +20,4 @@ export function CloudNodes(props) {
     </svg>
   )
 }
+

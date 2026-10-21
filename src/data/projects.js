@@ -24,20 +24,21 @@ export const truthlens = {
   contribution: '',
   links: {
     github: '',
-    live: 'https://truthlens-eight-blue.vercel.app',
+    live: 'https://veriquo.vercel.app',
   },
   screenshots: [
-    {
-      label: 'Interface',
-      src: truthlensUi,
-      alt: 'Veriqo home screen with a text claim and YouTube input and a Verify button',
-    },
-    {
-      label: 'Result',
-      src: truthlensResult,
-      alt: 'Veriqo verification result with verdict, confidence, explanation and evidence tabs',
-    },
-  ],
+  {
+    label: 'Home',
+    src: '/images/veriqo-home.webp',
+    alt: 'Veriquo home page with the heading "Trust but verify" and a box to paste a claim or YouTube link',
+  },
+  {
+    label: 'Result',
+    src: '/images/veriqo-result.webp',
+    alt: 'Veriquo verification result panel showing a Supported verdict, classifier confidence and evidence sources',
+  },
+],
+  
 }
 
 export const foodBridge = {
