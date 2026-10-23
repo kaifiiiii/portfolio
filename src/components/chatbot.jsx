@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { Brain, ChevronUp, FileText, Minus, MoreVertical, Rocket, Send, User, X } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { ArrowRight, Brain, ChevronUp, FileText, Minus, MoreVertical, Rocket, Send, User, X } from 'lucide-react'
 import ParticleSphere from './ParticleSphere'
 import './chatbot.css'
 
@@ -10,6 +10,90 @@ const SUGGESTIONS = [
   { label: 'View Résumé', Icon: FileText, question: "Can I see Kaif's résumé?" },
   { label: 'About Kaif', Icon: User, question: 'Tell me about Kaif.' },
 ]
+
+// ---------- Smart follow-up chips ----------
+// After each answer the chips follow the topic of the last question. They only send questions
+// to the normal chat flow, so every answer still comes from the assistant, never from this file.
+const chip = (question) => ({ label: question, Icon: ArrowRight, question })
+
+const FOLLOW_UPS = {
+  projects: [
+    'How does Veriqo work?',
+    'Tell me about Food Bridge',
+    'What tech stack did Kaif use?',
+    'Is there a live demo?',
+    'Which project uses Generative AI?',
+    'Which project uses MySQL?',
+  ].map(chip),
+  skills: [
+    'What frontend skills does Kaif have?',
+    'What backend skills does he have?',
+    'Does he know Generative AI?',
+    'What programming languages does he know?',
+    'What databases does he work with?',
+    'Which tools does he use?',
+  ].map(chip),
+  resume: [
+    'Where did Kaif study?',
+    'What certifications does he have?',
+    'Tell me about his internship',
+    'What are his strengths?',
+    'How can I contact him?',
+    'What projects has Kaif built?',
+  ].map(chip),
+  experience: [
+    'Tell me about his internship',
+    'What does he do at NSDC Society?',
+    'Is he part of GeeksforGeeks Society?',
+    'What certifications does he have?',
+    'Is he open to full-time roles?',
+    'What projects has Kaif built?',
+  ].map(chip),
+  education: [
+    'What is his CGPA?',
+    'What certifications does he have?',
+    'What are his main technical skills?',
+    'Tell me about his internship',
+    'What projects has Kaif built?',
+    "Can I see Kaif's résumé?",
+  ].map(chip),
+  contact: [
+    "Can I see Kaif's résumé?",
+    'What projects has Kaif built?',
+    'What are his main technical skills?',
+    'Is he open to full-time roles?',
+    'Where is Kaif based?',
+    'Tell me about Kaif.',
+  ].map(chip),
+}
+
+// First match wins, so the order matters
+const TOPICS = [
+  ['contact', /contact|e-?mail|reach|linkedin|github|hire|hiring|full[- ]?time|open to|available|based|location/],
+  ['resume', /r[eé]sum[eé]|\bcv\b/],
+  ['projects', /project|veriqo|veriquo|food bridge|demo|built|build/],
+  ['skills', /skill|tech|stack|react|node|express|python|java|sql|frontend|backend|language|tool|generative|rag|llm|\bai\b/],
+  ['experience', /experience|intern|edunet|vois|nsdc|geeksforgeeks|gfg|society|lead|work/],
+  ['education', /educat|degree|b\.?tech|cgpa|college|universit|jamia|school|stud(y|ies)|certif|course/],
+]
+
+// Up to four chips: the topic's follow-ups first, never repeating something already asked,
+// topped up from the four starter questions. Before any question, the starter chips show.
+function pickChips(messages) {
+  const asked = messages.filter((m) => m.role === 'user').map((m) => m.content.trim().toLowerCase())
+  if (asked.length === 0) return SUGGESTIONS
+  const last = asked[asked.length - 1]
+  const topic = TOPICS.find(([, re]) => re.test(last))?.[0]
+  const pool = [...(topic ? FOLLOW_UPS[topic] : []), ...SUGGESTIONS]
+  const seen = new Set()
+  const picked = pool.filter((c) => {
+    const key = c.question.toLowerCase()
+    if (asked.includes(key) || seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+  return picked.length ? picked.slice(0, 4) : SUGGESTIONS
+}
 
 const GREETING = {
   role: 'assistant',
@@ -55,8 +139,9 @@ function linkify(text) {
       <span key={i}>
         <a
           href={url}
-          target="_blank"
-          rel="noopener noreferrer"
+          {...(/\.pdf$/i.test(url)
+            ? { download: 'Mohammad-Kaif-Ali-Ansari-CV.pdf' } // PDFs download instead of opening
+            : { target: '_blank', rel: 'noopener noreferrer' })}
           className="text-sky-300 underline underline-offset-2 hover:text-white"
         >
           {url}
@@ -92,6 +177,7 @@ export default function Chatbot() {
   const hasOpened = useRef(false)
 
   // One chip group, shown only when the last message is a finished assistant reply
+  const chips = useMemo(() => pickChips(messages), [messages])
   const showChips = !busy && messages[messages.length - 1]?.role === 'assistant'
 
   // Open: mount first, then fade in on the next frame. Close: fade out, then unmount.
@@ -398,9 +484,9 @@ export default function Chatbot() {
                   {/* One chip group, below the latest finished answer */}
                   {showChips && (
                     <div className="flex flex-wrap gap-2 pl-[42px]">
-                      {SUGGESTIONS.map(({ label, Icon, question }) => (
+                      {chips.map(({ label, Icon, question }) => (
                         <button
-                          key={label}
+                          key={question}
                           type="button"
                           onClick={() => send(question)}
                           className="inline-flex items-center gap-2 rounded-full border border-sky-400/50 bg-navy-950/50 px-3.5 py-1.5 text-xs text-sky-100 shadow-[0_0_12px_-4px_rgba(47,139,255,0.7)] transition-[transform,border-color,background-color,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-sky-300 hover:bg-brand/15 hover:shadow-[0_0_18px_-3px_rgba(80,170,255,0.9)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
