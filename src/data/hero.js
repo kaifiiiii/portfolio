@@ -4,8 +4,8 @@ export const heroContent = {
   eyebrow: 'Welcome to my portfolio',
   greeting: "Hi, I'm",
   name: 'Kaif',
-  roleAccent: 'Full Stack',
-  role: 'Web Developer',
+  roleAccent: 'Software',
+  role: 'Developer',
   description:
     'I build modern web applications with React, Node.js, Express and SQL, and I explore how Generative AI can solve real-world problems. I enjoy turning ideas into practical, useful software.',
 }

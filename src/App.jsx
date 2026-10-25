@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import Navbar from './components/Navbar'
+import IntroLanding from './components/introlanding'
 import Hero from './components/Hero'
 import About from './components/About'
 import Skills from './components/Skills'
@@ -23,6 +24,13 @@ export default function App() {
   const [fieldOn, setFieldOn] = useState(false) // animated background allowed?
   const [density, setDensity] = useState(160)
   const [paused, setPaused] = useState(true) // true while the hero covers the screen
+  const [introDone, setIntroDone] = useState(false) // navbar and chatbot wait for the intro
+
+  // Intro finished (or skipped): reveal the page and let scroll animations re-measure
+  const handleIntroDone = useCallback(() => {
+    setIntroDone(true)
+    requestAnimationFrame(() => AOS.refreshHard())
+  }, [])
 
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -60,8 +68,13 @@ export default function App() {
         </div>
       )}
 
-      <Navbar />
+      {introDone && (
+        <div className="intro-fade-in">
+          <Navbar />
+        </div>
+      )}
       <main className={`relative z-10 ${fieldOn ? 'field-on' : ''}`}>
+        <IntroLanding onDone={handleIntroDone} />
         <Hero />
         <About />
         <Skills />
@@ -84,7 +97,11 @@ export default function App() {
         ))}
       </main>
 
-      <Chatbot />
+      {introDone && (
+        <div className="intro-fade-in" style={{ zIndex: 60 }}>
+          <Chatbot />
+        </div>
+      )}
     </>
   )
 }
