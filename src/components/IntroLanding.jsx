@@ -252,7 +252,7 @@ export default function IntroLanding({ onDone }) {
       // Fewer particles and a lower pixel ratio on phones and weaker machines
       const mobile = window.innerWidth < 768
       const lowEnd = (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4
-      const count = mobile ? 22000 : lowEnd ? 42000 : 70000
+      const count = mobile ? 32000 : lowEnd ? 42000 : 70000
       const cardCount = mobile ? 3 : CARDS.length
       cardRefs.current.slice(cardCount).forEach((el) => {
         if (el) el.style.display = 'none'
@@ -281,7 +281,10 @@ export default function IntroLanding({ onDone }) {
         uHelixShift: { value: 0 },
         uHelixK: { value: HELIX.K },
         uHelixHalf: { value: HELIX.half },
-        uSize: { value: mobile ? 2.1 : 1.6 },
+        uHelixTiles: { value: 1 },
+        uStretch: { value: 1 },
+        uLandScale: { value: new THREE.Vector3(1, 1, 1) },
+        uSize: { value: mobile ? 2.3 : 1.6 },
         uPixelRatio: { value: dpr },
         uBright: { value: 1 },
         uFade: { value: 0 },
@@ -317,6 +320,12 @@ export default function IntroLanding({ onDone }) {
         camera.updateProjectionMatrix()
         camZ = 5 * Math.max(1, 1.5 / camera.aspect) // step back on tall screens so the ring fits
         uniforms.uCamZ.value = camZ
+        // On tall screens the camera backs away to fit the width, so stretch the funnel,
+        // stack the helix and rescale the landscape to keep every scene filling the screen
+        const s = camZ / 5
+        uniforms.uStretch.value = s
+        uniforms.uHelixTiles.value = s < 1.4 ? 1 : Math.ceil((4.66 * s * 1.1) / 5)
+        uniforms.uLandScale.value.set(Math.min(1, (camera.aspect * s) / 1.78), s, s)
       }
       resize()
       const ro = new ResizeObserver(resize)

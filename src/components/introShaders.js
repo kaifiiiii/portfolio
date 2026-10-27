@@ -18,6 +18,9 @@ export const VERT = /* glsl */ `
   uniform float uHelixShift;
   uniform float uHelixK;
   uniform float uHelixHalf;
+  uniform float uHelixTiles; // how many helix lengths are stacked, so tall (phone) screens stay filled
+  uniform float uStretch; // vertical stretch for tall screens (1 on desktop)
+  uniform vec3 uLandScale; // keeps the landscape looking the same on any screen shape
   uniform float uSize;
   uniform float uPixelRatio;
   uniform float uBright;
@@ -63,7 +66,7 @@ export const VERT = /* glsl */ `
     float coneR = 0.3 + 2.6 * pow(u, 1.6);
     float barrelR = 1.9 + 0.18 * sin(u * 6.0 + t * 0.9) + 0.12 * sin(u * 11.0 - t * 0.6);
     float r = mix(coneR, barrelR, uShape);
-    return vec3(r * cos(f.x), f.y, r * sin(f.x));
+    return vec3(r * cos(f.x), f.y * uStretch, r * sin(f.x));
   }
 
   void main() {
@@ -84,28 +87,36 @@ export const VERT = /* glsl */ `
     vec3 fun = funnelPos(aFun, t);
     fun += vec3(sin(seed * 91.0), sin(seed * 57.0), sin(seed * 33.0)) * 0.006;
     fun.y *= 1.0 + 0.05 * sin(t * 1.1);
-    fun = rotY(fun, t * 0.35 + fun.y * 0.22);
+    fun = rotY(fun, t * 0.35 + (fun.y / uStretch) * 0.22);
 
     // 3. Helix: turns around its axis
     // The whole helix flows up or down along its axis. It is one full turn per 5 units,
     // so wrapping at the ends is seamless; particles fade out near the ends while they wrap.
-    float span = 2.0 * uHelixHalf;
+    float tiles = uHelixTiles;
+    float span = 2.0 * uHelixHalf * tiles;
+    float halfSpan = 0.5 * span;
+    float tile = floor(seed * tiles); // each particle belongs to one of the stacked lengths
     vec3 hel;
     if (aHelix.y > 50.0) {
       // Bright knot: sits where the two strands cross, and flows with them
       float n = floor((aHelix.y - 100.0) / 10.0);
       float gy = aHelix.y - 100.0 - n * 10.0 - 5.0;
-      float y0 = uHelixShift + (PI * 0.5) / uHelixK + n * (PI / uHelixK);
-      y0 = mod(y0 + uHelixHalf, span) - uHelixHalf;
+      float y0 = uHelixShift + (PI * 0.5) / uHelixK + (n + 2.0 * tile) * (PI / uHelixK);
+      y0 = mod(y0 + halfSpan, span) - halfSpan;
       hel = vec3(aHelix.x, y0 + gy, aHelix.z);
     } else {
-      float y1 = mod(aHelix.y + uHelixShift + uHelixHalf, span) - uHelixHalf;
+      float yb = aHelix.y + 2.0 * uHelixHalf * (tile - floor(tiles * 0.5));
+      float y1 = mod(yb + uHelixShift + halfSpan, span) - halfSpan;
       hel = vec3(aHelix.x, y1, aHelix.z);
     }
     hel += vec3(sin(t * 1.7 + seed * 30.0), sin(t * 1.3 + seed * 17.0), sin(t * 1.9 + seed * 11.0)) * 0.015;
 
     // 4. Landscape: slow waves
-    vec3 land = vec3(aLand.x, uLandY + landH(aLand.xz, t) + aLand.y, aLand.z);
+    vec3 land = vec3(
+      aLand.x * uLandScale.x,
+      (uLandY + landH(aLand.xz, t) + aLand.y) * uLandScale.y,
+      aLand.z * uLandScale.z
+    );
 
     float e1 = stage(uM1, seed);
     float e2 = stage(uM2, seed);
@@ -117,13 +128,13 @@ export const VERT = /* glsl */ `
 
     // While travelling, particles bend away from a straight line, and fall a little on the way down
     vec3 sw = vec3(sin(seed * 37.0 + t * 0.7), cos(seed * 53.0 + t * 0.6), sin(seed * 71.0 - t * 0.5));
-    p += sw * 0.22 * (sin(PI * e1) + sin(PI * e2) + sin(PI * e3));
-    p.y -= 0.9 * seed * sin(PI * e3);
+    p += sw * 0.22 * uStretch * (sin(PI * e1) + sin(PI * e2) + sin(PI * e3));
+    p.y -= 0.9 * uStretch * seed * sin(PI * e3);
 
     // Colour
     vec3 col = mix(aCol, aColH, e2);
     // Landscape colour follows the screen position: blue on the left, coral-red on the right
-    float camD = max(uCamZ - aLand.z, 1.0);
+    float camD = 5.0 - aLand.z; // colours follow the screen position the same way on every screen
     float lx = smoothstep(-0.95, 0.95, aLand.x / (camD * 0.83));
     vec3 lc = mix(vec3(0.3, 0.45, 1.0), vec3(0.52, 0.5, 1.0), smoothstep(0.0, 0.5, lx));
     lc = mix(lc, vec3(1.0, 0.5, 0.42), smoothstep(0.48, 0.7, lx));
@@ -136,7 +147,8 @@ export const VERT = /* glsl */ `
     float lb = (0.32 * rowFade + 1.0 * depthB * (1.0 - 0.85 * haze)) * edgeFade;
     col = mix(col, lc * lb, e3);
 
-    float phaseBright = mix(mix(mix(1.0, 0.45, e1), 1.15, e2), 0.9, e3);
+    float denseBoost = 1.0 + 0.15 * (uHelixTiles - 1.0); // fewer particles per length, so a little brighter
+    float phaseBright = mix(mix(mix(1.0, 0.45, e1), 1.15 * denseBoost, e2), 0.9, e3);
     float landSize = 1.0 + 0.5 * exp(-(aLand.z + 3.0) * 2.2); // crest particles are larger, so they bloom
     float sizeMul = mix(mix(mix(1.0, 1.5, e1), 1.1, e2), landSize, e3);
 
@@ -150,7 +162,7 @@ export const VERT = /* glsl */ `
     gl_PointSize = uSize * sizeMul * uPixelRatio * (0.55 + seed * 0.9) * (uCamZ * 1.2 / depth);
 
     vColor = col;
-    float helixEdge = 1.0 - smoothstep(2.25, 2.5, abs(hel.y));
+    float helixEdge = 1.0 - smoothstep(halfSpan - 0.25, halfSpan, abs(hel.y));
     float transit = 1.0 - 0.5 * max(sin(PI * e1), sin(PI * e3)); // dimmer while in motion, so it stays crisp
     vAlpha = uFade * uBright * phaseBright * transit * mix(1.0, helixEdge * (0.4 + 0.9 * tw), helixW);
   }
