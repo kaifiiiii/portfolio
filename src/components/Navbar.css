@@ -1,0 +1,286 @@
+/* Left-side vertical navigation.
+   Mouse screens: hidden completely until the cursor reaches the left edge, then it slides in.
+   Touch screens and phones: a small menu button and a slide-in drawer. */
+
+:root {
+  --sidebar-w: 0px; /* the sidebar never takes space from the page, it slides over it */
+  --sidebar-open-w: 140px; /* width while open */
+  --sidebar-edge: 24px; /* how close to the left edge the cursor must get to open it */
+  --nav-item-h: 3.25rem; /* height of one link row; the indicator moves in steps of this */
+}
+/* Short screens (landscape laptops): tighter rows so all links still fit */
+@media (max-height: 640px) {
+  :root {
+    --nav-item-h: 2.75rem;
+  }
+}
+
+/* The old top bar needed 5rem of room above anchor targets. There is no top bar now. */
+html {
+  scroll-padding-top: 0;
+}
+
+/* Wrapper around the page sections (kept so the page could reserve room for a sidebar) */
+.app-shell {
+  padding-left: var(--sidebar-w);
+}
+
+/* ---------- Sidebar (mouse screens) ---------- */
+.snav {
+  /* Full screen height, pinned to the left edge */
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  display: none;
+  box-sizing: border-box;
+  width: var(--sidebar-open-w);
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem 0;
+  background: var(--color-navy-950);
+  border-right: 1px solid rgb(255 255 255 / 0.08);
+  /* Closed: slid off screen and invisible. Only a thin strip at the edge stays in the page,
+     so the cursor has something to enter. */
+  transform: translateX(calc(-100% + var(--sidebar-edge)));
+  opacity: 0;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 0.8, 0.2, 1),
+    opacity 0.25s ease,
+    box-shadow 0.35s ease;
+  will-change: transform;
+}
+.snav[data-expanded] {
+  transform: none;
+  opacity: 1;
+  box-shadow: 14px 0 36px rgb(0 0 0 / 0.35);
+}
+
+/* Only screens with a real mouse get the hover sidebar; others get the menu button */
+@media (min-width: 768px) and (hover: hover) {
+  .snav {
+    display: flex;
+  }
+}
+
+.snav-logo {
+  align-self: flex-start;
+  margin-left: 1.25rem;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--color-brand);
+  text-decoration: none;
+  transition: transform 0.25s ease;
+}
+.snav-logo:hover {
+  transform: scale(1.1);
+}
+
+/* ---------- Links ---------- */
+.snav-list {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.snav-list > li:not(.snav-indicator) {
+  height: var(--nav-item-h);
+}
+
+/* One slim bar that slides to the active row */
+.snav-indicator {
+  position: absolute;
+  top: calc(var(--nav-item-h) * 0.2);
+  left: 0;
+  width: 3px;
+  height: calc(var(--nav-item-h) * 0.6);
+  border-radius: 0 3px 3px 0;
+  background: var(--color-brand);
+  transform: translateY(calc(var(--nav-item-h) * var(--i, 0)));
+  transition:
+    transform 0.5s cubic-bezier(0.65, 0, 0.35, 1),
+    opacity 0.3s ease;
+  pointer-events: none;
+}
+.snav-list[data-none] .snav-indicator {
+  opacity: 0;
+}
+
+.snav-link {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  padding-left: 1.25rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--color-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+.snav-link:hover {
+  color: var(--color-ink);
+  transform: translateX(3px);
+}
+.snav-link[aria-current="page"] {
+  color: var(--color-ink);
+}
+.snav-link:focus-visible,
+.snav-resume:focus-visible,
+.snav-logo:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: -2px;
+  border-radius: 0.5rem;
+}
+
+/* ---------- Resume ---------- */
+.snav-resume {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-left: 1.25rem;
+  color: var(--color-muted);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.25s ease;
+}
+.snav-resume-icon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 0.15);
+  border-radius: 50%;
+  transition:
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+.snav-resume:hover {
+  color: var(--color-brand);
+}
+.snav-resume:hover .snav-resume-icon {
+  border-color: var(--color-brand);
+  transform: translateY(-2px);
+}
+
+/* ---------- Touch screens and phones: small button + drawer ---------- */
+.snav-toggle {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 56;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 0.75rem;
+  background: var(--color-navy-950);
+  color: var(--color-ink);
+  cursor: pointer;
+  animation: snav-in 0.8s ease 0.1s backwards;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+@keyframes snav-in {
+  from {
+    opacity: 0;
+  }
+}
+.snav-toggle:hover {
+  color: var(--color-brand);
+  border-color: var(--color-brand);
+}
+.snav-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  visibility: hidden;
+  pointer-events: none;
+  transition: visibility 0s linear 0.35s;
+}
+.snav-drawer[data-open] {
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+.snav-scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgb(0 0 0 / 0.6);
+  opacity: 0;
+  cursor: default;
+  transition: opacity 0.3s ease;
+}
+.snav-drawer[data-open] .snav-scrim {
+  opacity: 1;
+}
+.snav-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  width: min(18rem, 82vw);
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 0 0 1.5rem;
+  background: var(--color-navy-950);
+  border-right: 1px solid rgb(255 255 255 / 0.08);
+  transform: translateX(-100%);
+  transition: transform 0.35s cubic-bezier(0.22, 0.8, 0.2, 1);
+}
+.snav-drawer[data-open] .snav-panel {
+  transform: none;
+}
+/* Sits to the right of the toggle button, which stays on top of the panel */
+.snav-wordmark {
+  display: flex;
+  height: 4.25rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding-left: 4.5rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--color-ink);
+  text-decoration: none;
+}
+.snav-wordmark-k {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  color: var(--color-brand);
+}
+.snav-list--row {
+  margin-top: 0.75rem;
+}
+.snav-list--row .snav-link {
+  padding-left: 1.75rem;
+  font-size: 1rem;
+}
+.snav-panel .snav-resume {
+  margin: auto 0 0 1.75rem;
+  padding-top: 1.5rem;
+}
+
+/* On screens with a mouse the sidebar replaces the button and drawer (kept last so it wins) */
+@media (min-width: 768px) and (hover: hover) {
+  .snav-toggle,
+  .snav-drawer {
+    display: none;
+  }
+}

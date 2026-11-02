@@ -20,7 +20,7 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 5rem; /* keeps the fixed navbar off section headings */
+  scroll-padding-top: 0; /* the navigation is a left sidebar now, so no top offset (see Navbar.css) */
 }
 
 body {
@@ -99,7 +99,8 @@ body {
 /* ---------- Animated background field ---------- */
 
 /* With the field on, sections after the hero let it show through */
-.field-on > section:not(#home) {
+.field-on > section:not(#home),
+.field-on .app-shell > section:not(#home) {
   background-color: rgb(5 10 22 / 0.45);
 }
 
@@ -140,7 +141,7 @@ body {
 }
 @media (min-width: 768px) {
   .orbit-stage {
-    --stage: min(100vw - 4rem, 700px);
+    --stage: min(100vw - var(--sidebar-w, 0px) - 4rem, 700px);
     --radius: calc(var(--stage) * 0.42);
     --badge: clamp(76px, calc(var(--stage) * 0.15), 104px);
   }

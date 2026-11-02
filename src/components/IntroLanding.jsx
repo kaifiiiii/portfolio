@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createShapes, HELIX } from './introShapes'
-import { VERT, FRAG } from './introShaders'
+import { VERT, FRAG } from './introshaders'
 import './IntroLanding.css'
 
 const HERO_ID = 'home' // id of the existing hero section

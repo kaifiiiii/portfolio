@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowRight, Brain, ChevronUp, FileText, Minus, MoreVertical, Rocket, Send, User, X } from 'lucide-react'
-import ParticleSphere from './ParticleSphere'
 import './chatbot.css'
 
 // Chip label shown to the visitor -> question actually sent through the normal chat flow
@@ -529,26 +528,33 @@ export default function Chatbot() {
         </section>
       )}
 
-      <div className="group relative">
-        {/* Tooltip: hover and keyboard focus only, hidden on small screens */}
-        <span
-          role="tooltip"
-          className="pointer-events-none absolute right-full top-1/2 mr-3 hidden -translate-y-1/2 whitespace-nowrap rounded-lg border border-brand/30 bg-navy-950/95 px-3 py-1.5 text-xs font-semibold tracking-[0.15em] text-ink opacity-0 transition-opacity duration-150 group-focus-within:opacity-100 group-hover:opacity-100 sm:block"
-        >
-          ASK KAI
-        </span>
+      <div className="relative">
+        {/* The launcher: a dark orb with a light that flows around inside it. The label swaps
+            between "Ask Kai" and a sparkle (all animation is in chatbot.css). */}
         <button
           ref={launcherRef}
           type="button"
           onClick={toggle}
           aria-label={open ? 'Close chat' : 'Open chat: ask KAI'}
           aria-expanded={open}
-          className="kai-launcher relative grid h-17 w-17 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-300 sm:h-21 sm:w-21"
+          data-busy={busy ? 'true' : 'false'}
+          className="kai-launcher"
         >
-          <span className="kai-orb relative block h-full w-full" data-busy={busy ? 'true' : 'false'}>
-            <span className="kai-orb-glow" />
-            <span className="kai-pdisc" />
-            <ParticleSphere busy={busy} pulseKey={pulse} />
+          <span className="kai-ask-orb" aria-hidden="true">
+            <span className="kai-ask-flow" />
+            <span className="kai-ask-shade" />
+            {pulse > 0 && <span key={pulse} className="kai-ask-pulse" />}
+            <span className="kai-ask-label">
+              <span className="kai-ask-ask">Ask</span>
+              <span className="kai-ask-name">Kai</span>
+              <svg className="kai-ask-twinkle" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 1c.9 6.2 4.8 10.1 11 11-6.2.9-10.1 4.8-11 11-.9-6.2-4.8-10.1-11-11C7.2 11.1 11.1 7.2 12 1Z" />
+              </svg>
+            </span>
+            <svg className="kai-ask-spark" viewBox="0 0 40 40" fill="currentColor">
+              <path d="M16 2c1.3 8.9 5.1 12.7 14 14-8.9 1.3-12.7 5.1-14 14-1.3-8.9-5.1-12.7-14-14C10.9 14.7 14.7 10.9 16 2Z" />
+              <path d="M31 24c.6 4.3 2.7 6.4 7 7-4.3.6-6.4 2.7-7 7-.6-4.3-2.7-6.4-7-7 4.3-.6 6.4-2.7 7-7Z" />
+            </svg>
           </span>
         </button>
       </div>

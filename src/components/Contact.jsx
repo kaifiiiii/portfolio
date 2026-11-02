@@ -43,7 +43,7 @@ export default function Contact() {
 
   return (
     <section id="contact" className="relative bg-navy-950 py-24 sm:py-32">
-      <div className="mx-auto max-w-5xl px-5 sm:px-8">
+      <div className="w-full px-5 sm:px-8 lg:px-14">
         <div className="max-w-2xl">
           <p className="mb-4 flex items-center gap-4 text-xs font-medium uppercase tracking-[0.25em] text-muted sm:text-sm">
             {contactContent.eyebrow}

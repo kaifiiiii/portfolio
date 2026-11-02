@@ -114,6 +114,7 @@ export default function Experience() {
     const render = (s) => {
       const vh = window.innerHeight
       const vw = window.innerWidth
+      const stageW = list.clientWidth || vw // the area right of the sidebar
       // On narrow screens the lanes close in toward the centre
       const spread = vw < 640 ? 0.12 : vw < 1024 ? 0.55 : 1
       const cy = vh / 2 + 24 // centre of the stage, below the fixed navbar
@@ -124,7 +125,7 @@ export default function Experience() {
         const d = i - s
         // One straight vertical path: below the screen (d = 1), at rest (d = 0), above it (d = -1)
         const travel = vh / 2 + h / 2 + 40
-        const cx = vw * (0.5 + (lane.x - 0.5) * spread)
+        const cx = stageW * (0.5 + (lane.x - 0.5) * spread)
         const x = cx - w / 2
         const y = cy - h / 2 + lane.y * vh + d * travel
         panel.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`

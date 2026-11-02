@@ -68,33 +68,33 @@ export default function App() {
         </div>
       )}
 
-      {introDone && (
-        <div className="intro-fade-in">
-          <Navbar />
-        </div>
-      )}
+      {/* The sidebar fades itself in (see Navbar.css), so it needs no animated wrapper */}
+      {introDone && <Navbar />}
       <main className={`relative z-10 ${fieldOn ? 'field-on' : ''}`}>
         <IntroLanding onDone={handleIntroDone} />
-        <Hero />
-        <About />
-        <Skills />
-        <Projects />
-        <Experience />
-        <Education />
-        <Contact />
-        {placeholders.map((link, i) => (
-          <section
-            key={link.id}
-            id={link.id}
-            className={`flex min-h-screen items-center justify-center px-5 ${
-              i % 2 === 0 ? 'bg-navy-900' : 'bg-navy-950'
-            }`}
-          >
-            <h2 className="font-display text-4xl font-bold">
-              {link.label} <span className="text-brand">section</span>
-            </h2>
-          </section>
-        ))}
+        {/* Everything after the intro starts to the right of the sidebar */}
+        <div className="app-shell">
+          <Hero />
+          <About />
+          <Skills />
+          <Projects />
+          <Experience />
+          <Education />
+          <Contact />
+          {placeholders.map((link, i) => (
+            <section
+              key={link.id}
+              id={link.id}
+              className={`flex min-h-screen items-center justify-center px-5 ${
+                i % 2 === 0 ? 'bg-navy-900' : 'bg-navy-950'
+              }`}
+            >
+              <h2 className="font-display text-4xl font-bold">
+                {link.label} <span className="text-brand">section</span>
+              </h2>
+            </section>
+          ))}
+        </div>
       </main>
 
       {introDone && (

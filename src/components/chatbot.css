@@ -1,4 +1,5 @@
 /* KAI chatbot: glowing frame, ambient background, slow glow animation. */
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap");
 
 /* Outer frame: a 1.5px gradient ring (white, blue, cyan, violet) around the dark panel */
 .kai-frame {
@@ -241,46 +242,246 @@
   }
 }
 
-/* ---------- Particle sphere launcher ---------- */
+/* ---------- "Ask Kai" launcher ---------- */
+/* A dark orb with a light that flows around inside it. The label swaps between "Ask Kai" and a
+   sparkle. Colours come from the theme (--color-brand, --color-brand-soft, --color-navy-950),
+   so changing the theme recolours it. Sizes use container units (cqw) so it scales as one piece. */
 
-/* Dark navy-purple core behind the particles */
-.kai-pdisc {
-  position: absolute;
-  inset: 9%;
-  border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(circle at 50% 38%, rgba(30, 16, 70, 0.75), rgba(10, 6, 30, 0.9) 72%);
-  box-shadow: inset 0 0 14px rgba(120, 100, 255, 0.25);
-}
-
-.kai-pcanvas {
+.kai-launcher {
+  --kai-size: 68px;
   position: relative;
-  transition: filter 0.2s ease, transform 0.2s ease;
-}
-
-/* Hover and keyboard focus: brighter particles, very slightly larger */
-.kai-launcher:hover .kai-pcanvas,
-.kai-launcher:focus-visible .kai-pcanvas {
-  transform: scale(1.06);
-  filter: brightness(1.25) saturate(1.1);
-}
-
-/* KAI is thinking: restrained cyan-blue glow, size unchanged */
-.kai-orb[data-busy='true'] .kai-pcanvas {
-  filter: brightness(1.12) drop-shadow(0 0 6px rgba(80, 200, 255, 0.5));
-}
-
-.kai-pfallback {
+  display: block;
+  width: var(--kai-size);
+  height: var(--kai-size);
+  padding: 0;
+  border: 0;
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 30%, #3aa0ff 0%, #5b6cff 40%, #b05bff 75%, #ee7aff 100%);
-  opacity: 0.85;
+  background: none;
+  color: #fff;
+  cursor: pointer;
+  container-type: size;
+  -webkit-tap-highlight-color: transparent;
+  animation: kai-ask-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transition: transform 0.25s cubic-bezier(0.22, 0.8, 0.2, 1);
+}
+@media (min-width: 640px) {
+  .kai-launcher {
+    --kai-size: 84px;
+  }
+}
+.kai-launcher:hover {
+  transform: scale(1.07);
+}
+.kai-launcher:active {
+  transform: scale(0.96);
+}
+.kai-launcher:focus-visible {
+  outline: 2px solid var(--color-brand-soft, #6cb4ff);
+  outline-offset: 4px;
+}
+@keyframes kai-ask-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+.kai-ask-orb {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, var(--color-navy-900, #0a1226), #02040a 85%);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-brand-soft, #6cb4ff) 30%, transparent),
+    0 10px 26px -6px color-mix(in srgb, var(--color-brand, #1d8bff) 55%, transparent),
+    0 4px 14px rgb(0 0 0 / 0.45);
+}
+
+/* The light: a soft bright patch that travels around inside the dark orb */
+.kai-ask-flow {
+  position: absolute;
+  inset: -35%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    var(--color-brand, #1d8bff) 45deg,
+    var(--color-brand-soft, #6cb4ff) 85deg,
+    var(--color-brand, #1d8bff) 125deg,
+    transparent 185deg,
+    transparent 360deg
+  );
+  filter: blur(12cqw);
+  animation: kai-ask-spin 7s linear infinite;
+}
+@keyframes kai-ask-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Depth: dark edge, soft highlight at the top, thin rim light */
+.kai-ask-shade {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 50%, rgb(0 0 0 / 0.55) 100%),
+    radial-gradient(circle at 30% 20%, rgb(255 255 255 / 0.26), transparent 38%);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.1),
+    inset 0 -8px 18px rgb(0 0 0 / 0.35);
+}
+
+/* One quick flash when the chat opens */
+.kai-ask-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 255 255 / 0.55), transparent 65%);
+  opacity: 0;
+  animation: kai-ask-pulse 0.9s ease-out 1;
+}
+@keyframes kai-ask-pulse {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+/* Label: "Ask Kai" for a while, then a sparkle, then back (8 s loop) */
+.kai-ask-label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  line-height: 1;
+  animation: kai-ask-label 8s ease-in-out infinite;
+}
+.kai-ask-ask {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 14cqw;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-shadow: 0 1px 6px rgb(0 0 0 / 0.5);
+}
+.kai-ask-name {
+  margin-top: -1.5cqw;
+  font-family: "Dancing Script", "Segoe Script", "Brush Script MT", cursive;
+  font-size: 34cqw;
+  font-weight: 700;
+  line-height: 0.95;
+  text-shadow:
+    0 0 12px color-mix(in srgb, var(--color-brand-soft, #6cb4ff) 70%, transparent),
+    0 1px 6px rgb(0 0 0 / 0.5);
+}
+.kai-ask-twinkle {
+  position: absolute;
+  top: 27cqw;
+  right: 14cqw;
+  width: 14cqw;
+  height: 14cqw;
+  animation: kai-ask-twinkle 2.4s ease-in-out infinite;
+}
+@keyframes kai-ask-twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.6) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+}
+@keyframes kai-ask-label {
+  0%,
+  38% {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+  46%,
+  90% {
+    opacity: 0;
+    transform: scale(0.88);
+    filter: blur(3px);
+  }
+  98%,
+  100% {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+.kai-ask-spark {
+  position: absolute;
+  inset: 0;
+  width: 46cqw;
+  height: 46cqw;
+  margin: auto;
+  opacity: 0;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--color-brand-soft, #6cb4ff) 80%, transparent));
+  animation: kai-ask-spark 8s ease-in-out infinite;
+}
+@keyframes kai-ask-spark {
+  0%,
+  40% {
+    opacity: 0;
+    transform: scale(0.6) rotate(-30deg);
+  }
+  50%,
+  86% {
+    opacity: 1;
+    transform: none;
+  }
+  94%,
+  100% {
+    opacity: 0;
+    transform: scale(0.6) rotate(30deg);
+  }
+}
+
+/* Hover: the light moves faster. While KAI is answering: faster still, and a little brighter. */
+.kai-launcher:hover .kai-ask-flow,
+.kai-launcher:focus-visible .kai-ask-flow {
+  animation-duration: 3.5s;
+}
+.kai-launcher[data-busy='true'] .kai-ask-flow {
+  animation-duration: 2s;
+}
+.kai-launcher[data-busy='true'] .kai-ask-orb {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-brand-soft, #6cb4ff) 55%, transparent),
+    0 10px 30px -4px color-mix(in srgb, var(--color-brand, #1d8bff) 80%, transparent),
+    0 4px 14px rgb(0 0 0 / 0.45);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .kai-pcanvas,
-  .kai-launcher:hover .kai-pcanvas,
-  .kai-launcher:focus-visible .kai-pcanvas {
+  .kai-launcher,
+  .kai-launcher:hover,
+  .kai-launcher:active {
+    animation: none;
     transition: none;
     transform: none;
+  }
+  .kai-ask-flow {
+    animation: none;
+    transform: rotate(40deg);
+  }
+  .kai-ask-label,
+  .kai-ask-twinkle,
+  .kai-ask-pulse {
+    animation: none;
+  }
+  .kai-ask-spark {
+    display: none;
   }
 }

@@ -9,7 +9,7 @@ export default function About() {
 
   return (
     <section id="about" className="relative overflow-x-clip bg-navy-950 py-24 sm:py-32">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+      <div className="w-full px-5 sm:px-8 lg:px-14">
         {/* Heading */}
         <div data-aos="fade-up" className="max-w-3xl">
           <p className="mb-3 flex items-center gap-4 text-xs font-medium uppercase tracking-[0.25em] text-muted sm:text-sm">

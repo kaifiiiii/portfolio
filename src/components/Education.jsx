@@ -50,7 +50,7 @@ export default function Education() {
 
   return (
     <section id="education" className="relative bg-navy-900 py-24 sm:py-32">
-      <div className="mx-auto max-w-5xl px-5 sm:px-8">
+      <div className="w-full px-5 sm:px-8 lg:px-14">
         {/* Tall track: gives the scroll distance that moves the highlight */}
         <div
           ref={trackRef}

@@ -5,7 +5,7 @@ import SkillsCarousel from './SkillsCarousel'
 export default function Skills() {
   return (
     <section id="skills" className="skills-section relative overflow-hidden bg-[#050914] py-24 sm:py-32">
-      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+      <div className="relative w-full px-5 sm:px-8 lg:px-14">
         <SkillsOrbit />
         <SkillsCarousel />
       </div>

@@ -187,7 +187,7 @@ export default function Hero() {
       </div>
 
       {/* ---------- Content on top ---------- */}
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 sm:px-8">
+      <div className="relative z-10 w-full px-5 sm:px-8 lg:px-14">
         <div className="max-w-2xl">
                     <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-300">
             <span className="relative flex h-2 w-2" aria-hidden="true">

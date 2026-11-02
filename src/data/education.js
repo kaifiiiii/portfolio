@@ -80,4 +80,4 @@ export const certifications = [
       'Foundational learning in data science, analytics methodologies, and data-driven business approaches.',
     link: '',
   },
-]
+]
