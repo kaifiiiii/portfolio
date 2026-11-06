@@ -290,11 +290,6 @@ body {
   text-transform: uppercase;
   color: #fff;
 }
-.orbit-core-rule {
-  width: 34%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #38bdf8, transparent);
-}
 .orbit-core-caption {
   margin: 0;
   font-size: max(10.5px, 3.6cqw);

@@ -47,7 +47,6 @@ export default function Contact() {
         <div className="max-w-2xl">
           <p className="mb-4 flex items-center gap-4 text-xs font-medium uppercase tracking-[0.25em] text-muted sm:text-sm">
             {contactContent.eyebrow}
-            <span aria-hidden="true" className="h-px w-12 bg-brand" />
           </p>
           <h2 className="font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl">
             {contactContent.heading}

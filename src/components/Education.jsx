@@ -64,7 +64,6 @@ export default function Education() {
             <div data-aos="fade-up" className="max-w-2xl">
               <p className="mb-4 flex items-center gap-4 text-xs font-medium uppercase tracking-[0.25em] text-muted sm:text-sm">
                 {educationContent.eyebrow}
-                <span aria-hidden="true" className="h-px w-12 bg-brand" />
               </p>
               <h2 className="font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl">
                 {educationContent.heading}
@@ -148,7 +147,6 @@ export default function Education() {
             className="mb-8 flex items-center gap-4 text-xs font-medium uppercase tracking-[0.25em] text-muted sm:text-sm"
           >
             {certificationsHeading}
-            <span aria-hidden="true" className="h-px w-12 bg-brand" />
           </h3>
 
           <div data-aos="fade-up">

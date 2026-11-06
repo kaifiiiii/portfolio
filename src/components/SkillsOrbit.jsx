@@ -19,9 +19,7 @@ export default function SkillsOrbit() {
           style={{ '--d': '0s' }}
           className="sk-head mb-4 flex items-center justify-center gap-4 text-xs font-medium uppercase tracking-[0.22em] text-muted sm:text-sm sm:tracking-[0.35em]"
         >
-          <span aria-hidden="true" className="h-px w-6 bg-brand/70 sm:w-16" />
           Technical expertise
-          <span aria-hidden="true" className="h-px w-6 bg-brand/70 sm:w-16" />
         </p>
         <h2
           style={{ '--d': '0.12s' }}
@@ -58,7 +56,6 @@ export default function SkillsOrbit() {
             <p className="orbit-core-title">
               CODE × AI
             </p>
-            <span aria-hidden="true" className="orbit-core-rule" />
             <p className="orbit-core-caption">Learning. Building. Evolving.</p>
           </div>
         </div>
@@ -89,3 +86,4 @@ export default function SkillsOrbit() {
     </div>
   )
 }
+

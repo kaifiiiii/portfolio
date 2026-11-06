@@ -14,7 +14,6 @@ export default function About() {
         <div data-aos="fade-up" className="max-w-3xl">
           <p className="mb-3 flex items-center gap-4 text-xs font-medium uppercase tracking-[0.25em] text-muted sm:text-sm">
             {aboutContent.eyebrow}
-            <span aria-hidden="true" className="h-px w-12 bg-brand" />
           </p>
           <h2 className="font-display text-3xl font-extrabold leading-tight text-white sm:text-5xl">
             {aboutContent.heading}

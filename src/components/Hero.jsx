@@ -198,7 +198,6 @@ export default function Hero() {
           </p>
           <p className="mb-4 flex items-center gap-4 text-xs font-medium uppercase tracking-[0.25em] text-muted sm:text-sm">
             {heroContent.eyebrow}
-            <span aria-hidden="true" className="hidden h-px w-16 bg-brand sm:block" />
           </p>
 
           <h1 className="font-display font-extrabold leading-[0.95]">
